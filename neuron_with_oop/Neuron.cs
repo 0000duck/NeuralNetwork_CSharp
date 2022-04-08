@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace neuron_with_oop
 {
+    [Serializable]
+    
     public class Neuron
     {
         public List<double> Weights { get; }
@@ -23,6 +27,7 @@ namespace neuron_with_oop
             InitWeightsRandomValues(inputCount);
 
         }
+        
 
         private void InitWeightsRandomValues(int inputCount)
         {
@@ -36,7 +41,7 @@ namespace neuron_with_oop
                 else
                 {
                     Weights.Add(rnd.NextDouble());
-                }
+                }               
                 
                 Inputs.Add(0);
             }
@@ -84,6 +89,7 @@ namespace neuron_with_oop
 
         public void Learn(double error, double learningRate)
         {
+            
             if(NeuronType == NeuronType.Input)
             {
                 return;
@@ -98,6 +104,8 @@ namespace neuron_with_oop
 
                 var newWeight = weight - input * delta * learningRate;
                 Weights[i] = newWeight;
+
+                
             }
             Delta = delta;
         }

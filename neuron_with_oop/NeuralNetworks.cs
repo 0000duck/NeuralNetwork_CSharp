@@ -1,25 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace neuron_with_oop
+﻿namespace neuron_with_oop
 {
-    class Program {
+    class Program
+    {
         static void Main(string[] args)
         {
-            Console.WriteLine("Welcome!");
         }
     }
-    
+
 
     public class NeuralNetworks
     {
-        public Topology Topology { get;  }
-        public List<Layer> Layers { get;  }
+        public Topology Topology { get; }
+        public List<Layer> Layers { get; }
 
-        public NeuralNetworks(Topology topology )
+        public NeuralNetworks(Topology topology)
         {
             Topology = topology;
 
@@ -31,7 +25,7 @@ namespace neuron_with_oop
 
         }
 
-        public Neuron FeedForward(params double[] inputSignals)
+        public Neuron Predict(params double[] inputSignals)
         {
 
 
@@ -49,21 +43,21 @@ namespace neuron_with_oop
         }
         public double Learn(double[] expected, double[,] inputs, int epoch)
         {
-            var signals = Normalization(inputs);
+            //var signals = Normalization(inputs);
 
             var error = 0.0;
             for (int i = 0; i < epoch; i++)
-            { 
+            {
                 for (int j = 0; j < expected.Length; j++)
                 {
                     var output = expected[j];
-                    var input = GetRow(signals, j);
+                    var input = GetRow(inputs, j);
 
                     error += Backpropagation(output, input);
 
                 }
             }
-        
+
             var result = error / epoch;
             return result;
         }
@@ -82,27 +76,27 @@ namespace neuron_with_oop
 
         private double[,] Scalling(double[,] inputs) // Маштабирование
         {
-            var result = new double[inputs.GetLength(0) , inputs.GetLength(1)];
-            
+            var result = new double[inputs.GetLength(0), inputs.GetLength(1)];
+
             for (int coloumn = 0; coloumn < inputs.GetLength(1); coloumn++)
             {
                 var min = inputs[0, coloumn];
                 var max = inputs[0, coloumn];
-                for(int row = 1; row< inputs.GetLength(0); row++)
+                for (int row = 1; row < inputs.GetLength(0); row++)
                 {
                     var item = inputs[row, coloumn];
                     if (item < min)
                         min = item;
-                    
+
 
                     if (item > max)
                         max = item;
-                    
+
                 }
                 var div = max - min;
-                for (int row = 1; row< inputs.GetLength(0); row++)
+                for (int row = 1; row < inputs.GetLength(0); row++)
                 {
-                    result[row, coloumn] = (inputs[row, coloumn] - min ) / div;
+                    result[row, coloumn] = (inputs[row, coloumn] - min) / div;
                 }
             }
             return result;
@@ -111,7 +105,7 @@ namespace neuron_with_oop
 
         private double[,] Normalization(double[,] inputs) //Нормализация
         {
-            var result = new double[inputs.GetLength(0) , inputs.GetLength(1)];
+            var result = new double[inputs.GetLength(0), inputs.GetLength(1)];
 
             for (int coloumn = 0; coloumn < inputs.GetLength(1); coloumn++)
             {
@@ -126,7 +120,7 @@ namespace neuron_with_oop
                 var error = 0.0;
                 for (int row = 0; row < inputs.GetLength(0); row++)//Стандартное квадратичное отклонение нецрона
                 {
-                    error = Math.Pow((error + inputs[row, coloumn] - average),2);
+                    error = Math.Pow((error + inputs[row, coloumn] - average), 2);
                 }
                 var standartError = Math.Sqrt(error / inputs.GetLength(0));
 
@@ -142,16 +136,16 @@ namespace neuron_with_oop
 
         private double Backpropagation(double expected, params double[] inputs)//обратное распространение ошибки
         {
-            var actual = FeedForward(inputs).Output;
+            var actual = Predict(inputs).Output;
 
             var difference = actual - expected;
 
-            foreach(var neuron in Layers.Last().Neurons)
+            foreach (var neuron in Layers.Last().Neurons)
             {
                 neuron.Learn(difference, Topology.LearningRate);
             }
 
-            for(int j = Layers.Count - 2; j >= 0; j--)// -2 т.к. нумерация с 0 и еще один слой мы уже обучили
+            for (int j = Layers.Count - 2; j >= 0; j--)// -2 т.к. нумерация с 0 и еще один слой мы уже обучили
             {
                 var layer = Layers[j];
                 var prevLayer = Layers[j + 1];
@@ -160,7 +154,7 @@ namespace neuron_with_oop
                 {
                     var neuron = layer.Neurons[i];
 
-                    for(int k = 0; k < prevLayer.NeuronCount; k++)
+                    for (int k = 0; k < prevLayer.NeuronCount; k++)
                     {
                         var prevNeuron = prevLayer.Neurons[k];
                         var error = prevNeuron.Weights[i] * prevNeuron.Delta;
@@ -212,7 +206,7 @@ namespace neuron_with_oop
                 var neuron = new Neuron(lastLayer.NeuronCount, NeuronType.Output);
                 outputNeurons.Add(neuron);
             }
-            var outputLayer= new Layer(outputNeurons, NeuronType.Output);
+            var outputLayer = new Layer(outputNeurons, NeuronType.Output);
             Layers.Add(outputLayer);
         }
 
@@ -235,18 +229,13 @@ namespace neuron_with_oop
         private void CreateInputLayer()
         {
             var inputNeurons = new List<Neuron>();
-            for(int i = 0; i < Topology.InputCount; i++)
+            for (int i = 0; i < Topology.InputCount; i++)
             {
                 var neuron = new Neuron(1, NeuronType.Input);
                 inputNeurons.Add(neuron);
             }
-            var inputLayer = new Layer(inputNeurons,NeuronType.Input);
+            var inputLayer = new Layer(inputNeurons, NeuronType.Input);
             Layers.Add(inputLayer);
         }
-
-        
-
-
     }
-
 }
