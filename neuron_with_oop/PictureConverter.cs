@@ -11,12 +11,12 @@ namespace neuron_with_oop
         public int Width { get; set; }
 
 
-        public double[] Convert(string path)
+        public double[] Convert(Bitmap img)
         {
             var result = new List<double>();
 
-            var image = new Bitmap(path);
-            var resizeImage = new Bitmap(image, new Size(20, 20));
+            var image = new Bitmap(img);
+            var resizeImage = new Bitmap(image, new Size(15, 15));
 
 
             Height = resizeImage.Height;

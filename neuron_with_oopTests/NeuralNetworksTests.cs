@@ -13,7 +13,7 @@ namespace neuron_with_oop.Tests
     [TestClass()]
     public class NeuralNetworksTests
     {
-        [TestMethod()]
+        /*[TestMethod()]
         public void FeedForwardTest()
         {
             var outputs = new double[] { 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1 };
@@ -46,16 +46,16 @@ namespace neuron_with_oop.Tests
             };
 
 
-            var topology = new Topology(4, 1,0.1, 3);
-            var neuralNetwork = new NeuralNetworks(topology);           
-            var difference = neuralNetwork.Learn(outputs,inputs, 300000);
+            var topology = new Topology(4, 1, 0.1, 3);
+            var neuralNetwork = new NeuralNetworks(topology);
+            var difference = neuralNetwork.Learn(outputs, inputs, 300000);
 
             var results = new List<double>();
             for (int i = 0; i < outputs.Length; i++)
             {
                 var row = NeuralNetworks.GetRow(inputs, i);
                 var res = neuralNetwork.Predict(row).Output;
-                results.Add(res);   
+                results.Add(res);
             }
 
             for (int i = 0; i < results.Count; i++)
@@ -65,15 +65,15 @@ namespace neuron_with_oop.Tests
 
                 Assert.AreEqual(expected, actual);
             }
-            
 
-        }
 
-        [TestMethod()]
+        }*/
+
+        /*[TestMethod()]
         public void DataSetTest()
         {
             var outputs = new List<double>();
-            var inputs = new List<double[]>();    
+            var inputs = new List<double[]>();
             using (var sr = new StreamReader(@"C:\Users\sempaku\Desktop\обучение по нейронке\neuron_with_oopTests\hearth.csv"))
             {
                 var header = sr.ReadLine();
@@ -81,9 +81,9 @@ namespace neuron_with_oop.Tests
                 while (!sr.EndOfStream)
                 {
                     var row = sr.ReadLine();
-                    var values = row.Split(',').Select(v => Convert.ToDouble(v.Replace(".",","))).ToList();
+                    var values = row.Split(',').Select(v => Convert.ToDouble(v.Replace(".", ","))).ToList();
                     var output = values.Last();
-                    var input = values.Take(values.Count - 1 ).ToArray();
+                    var input = values.Take(values.Count - 1).ToArray();
 
                     outputs.Add(output);
                     inputs.Add(input);
@@ -92,7 +92,7 @@ namespace neuron_with_oop.Tests
             }
 
             var inputSignals = new double[inputs.Count, inputs[0].Length];
-            for(int i = 0; i < inputSignals.GetLength(0); i++)
+            for (int i = 0; i < inputSignals.GetLength(0); i++)
             {
                 for (var j = 0; j < inputSignals.GetLength(1); j++)
                 {
@@ -100,14 +100,14 @@ namespace neuron_with_oop.Tests
                 }
             }
 
-            var topology = new Topology(outputs.Count, 1, 0.1, outputs.Count/2);
+            var topology = new Topology(outputs.Count, 1, 0.1, outputs.Count / 2);
             var neuralNetwork = new NeuralNetworks(topology);
             var difference = neuralNetwork.Learn(outputs.ToArray(), inputSignals, 100);
 
             var results = new List<double>();
             for (int i = 0; i < outputs.Count; i++)
             {
-                
+
                 var res = neuralNetwork.Predict(inputs[i]).Output;
                 results.Add(res);
             }
@@ -121,29 +121,32 @@ namespace neuron_with_oop.Tests
             }
 
 
-        }
+        }*/
 
         [TestMethod()]
         public void RecognaizeImage()
         {
-            var size = 1000;
+            var size = 2;
 
             var parasitizedPath = @"C:\Users\sempaku\Desktop\cell_images\Parasitized\";
             var unparasitizedPath = @"C:\Users\sempaku\Desktop\cell_images\Uninfected\";
 
             var converter = new PictureConverter();
-            var testParasitizedImageInput = converter.Convert(@"C:\Users\sempaku\Desktop\Neural Med SYs\NeuralNetwoek\neuron_with_oopTests\malaria\paraz\paraz.png");
-            var testUnparasitizedImageInput = converter.Convert(@"C:\Users\sempaku\Desktop\Neural Med SYs\NeuralNetwoek\neuron_with_oopTests\malaria\unparaz\unparaz.png");
+            var deleter = new DelBlack();
 
-            var topology = new Topology(testParasitizedImageInput.Length, 2, 0.1, testParasitizedImageInput.Length * 2);
+
+            var testParasitizedImageInput = converter.Convert(deleter.Violetted(@"C:\Users\sempaku\Desktop\Neural Med SYs\NeuralNetwoek\neuron_with_oopTests\malaria\paraz\paraz.png"));
+            var testUnparasitizedImageInput = converter.Convert(deleter.Violetted(@"C:\Users\sempaku\Desktop\Neural Med SYs\NeuralNetwoek\neuron_with_oopTests\malaria\unparaz\unparaz.png"));
+
+            var topology = new Topology(testParasitizedImageInput.Length, 1, 0.1, testParasitizedImageInput.Length * 5);
             var neuralNetwork = new NeuralNetworks(topology);
 
 
-            double[,] unparasitizedInputs = GetData(unparasitizedPath, converter, testParasitizedImageInput,size);
-            neuralNetwork.Learn(new double[] { 0 }, unparasitizedInputs, 100);
+            double[,] unparasitizedInputs = GetData(unparasitizedPath, converter, testParasitizedImageInput, size);
+            neuralNetwork.Learn(new double[] { 0 }, unparasitizedInputs, 300);
 
             double[,] parasitizedInputs = GetData(parasitizedPath, converter, testParasitizedImageInput, size);
-            neuralNetwork.Learn(new double[] { 1 }, parasitizedInputs, 100);
+            neuralNetwork.Learn(new double[] { 1 }, parasitizedInputs, 30);
 
             var par = neuralNetwork.Predict(testParasitizedImageInput.Select(t => (double)t).ToArray());
             var unpar = neuralNetwork.Predict(testUnparasitizedImageInput.Select(t => (double)t).ToArray());
@@ -152,13 +155,14 @@ namespace neuron_with_oop.Tests
             Assert.AreEqual(0, Math.Round(unpar.Output, 2));
         }
 
-        private static double[,] GetData(string parasitizedPath, PictureConverter converter, double[] testImageInput,int size )
+        private static double[,] GetData(string parasitizedPath, PictureConverter converter, double[] testImageInput, int size)
         {
+            var deleter = new DelBlack();
             var images = Directory.GetFiles(parasitizedPath);
             var result = new double[size, testImageInput.Length];
             for (int i = 0; i < size; i++)// i -> кол-во изображений
             {
-                var image = converter.Convert(images[i]);
+                var image = converter.Convert(deleter.Violetted(images[i]));
                 for (int j = 0; j < image.Length; j++)
                 {
                     result[i, j] = image[j];
@@ -168,7 +172,7 @@ namespace neuron_with_oop.Tests
             return result;
         }
 
-        [TestMethod]
+        /*[TestMethod]
         public void XORTest()
         {
             var outputs = new double[] { 0, 1, 1, 0 };
@@ -200,10 +204,10 @@ namespace neuron_with_oop.Tests
 
                 Assert.AreEqual(expected, actual);
             }
-        }
+        }*/
 
-        [TestMethod]
-        public void SearchNumber() 
+        /*[TestMethod]
+        public void SearchNumber()
         {
             var size = 1000;
 
@@ -221,21 +225,21 @@ namespace neuron_with_oop.Tests
             double[,] edInputs = GetData(edinicaPath, converter, testedinica, size);
             double[,] nlInputs = GetData(nullPath, converter, testnull, size);
 
-            
+
             neuralNetwork.Learn(new double[] { 1 }, edInputs, 3);
             neuralNetwork.Learn(new double[] { 0 }, nlInputs, 3);
-            
+
 
             var ed = neuralNetwork.Predict(testedinica.Select(t => (double)t).ToArray());
             var nl = neuralNetwork.Predict(testnull.Select(t => (double)t).ToArray());
 
             Assert.AreEqual(0, Math.Round(nl.Output, 2));
             Assert.AreEqual(1, Math.Round(ed.Output, 2));
-            
 
 
-        }
+
+        }*/
     }
 
-    
+
 }
